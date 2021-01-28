@@ -1,4 +1,4 @@
-# petang
+# Petang
 
 ## Project setup
 ```
