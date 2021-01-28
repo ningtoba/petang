@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :class="typeof weather.main != 'undefined' && weather.main.temp > 27 ? 'warm' : ''" class="bg-cover">
+  <div id="app" :class="typeof weather.main != 'undefined' && weather.main.temp > 27 ? 'warm' : ''">
     <main class="p-5 h-screen">
       <div class="search-box w-full mb-3">
         <input type="text" class="search-bar block w-full p-3 appearance-none border-none bg-none bg-white opacity-50 outline-none focus:outline-none focus:opacity-70 focus:rounded-tl-xl focus:rounded-br-xl focus:rounded-bl-none focus:rounded-tr-none focus:shadow-lg rounded-bl-xl rounded-tr-xl transition-all duration-500" placeholder="Search..." v-model="query" @keypress="fetchWeather">
@@ -12,7 +12,7 @@
         </div>
         <div class="weather-box text-center">
           <div class="temp inline-block px-5 py-6 m-4 text-white text-7xl font-extrabold text-shadow-md bg-gray-50 bg-opacity-25 rounded-lg shadow-md">{{ Math.round(weather.main.temp) }}°c</div>
-          <div class="weather text-white text-2xl font-bold text-shadow-md">{{ weather.weather[0].main }}</div>
+          <div class="weather text-white text-2xl font-bold text-shadow-md capitalize">{{ weather.weather[0].description }}</div>
         </div>
       </div>
     </main>
@@ -35,7 +35,7 @@ export default {
   methods: {
     fetchWeather (e) {
       if (e.key == 'Enter') {
-        fetch(`${this.url_base}weather?q=${this.query}&units=metric&APPID=${this.api_key}`)
+        fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
           .then(res => {
             return res.json();
           }).then(this.setResults);
@@ -78,7 +78,7 @@ export default {
       let year = d.getFullYear();
 
       return `${day} ${date} ${month} ${year}`;
-    }
+    },
   }
 }
 </script>
@@ -101,10 +101,12 @@ export default {
   }
 
   main {
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.75));
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.60));
+    background-size: cover;
   }
 
   #app.warm {
     background-image: url('./assets/warm.jpg');
+    background-size: cover;
   }
 </style>
