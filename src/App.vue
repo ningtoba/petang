@@ -105,60 +105,63 @@ export default {
   },
 
   created() {
-    window.setInterval(() => {
-        this.ampmTime = this.currentTime()
-        this.ampmForecast[0] = this.forecastTime(3)
-        this.ampmForecast[1] = this.forecastTime(6)
-        this.ampmForecast[2] = this.forecastTime(9)
-        this.ampmForecast[3] = this.forecastTime(12)
-        this.ampmForecast[4] = this.forecastTime(15)
-    },5 * 1000);
-  },
-
-  mounted() {
-      fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
-        .then(res => {
-          return res.json();
-        })
-        .then(this.weatherResults)
+    fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
+        .then(res => res.json())
+        .then(data => (this.weather = data))
         .then(this.getCurrentIcon);
 
       fetch(`${this.url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.api_key}`)
-        .then(res => {
-          return res.json();
-        })
-        .then(this.forecastResults)
+        .then(res => res.json())
+        .then(data => (this.forecast = data))
         .then(this.getForecastIcon);
   },
 
+  mounted() {
+    this.ampmTime = this.currentTime()
+    this.ampmForecast[0] = this.forecastTime(3)
+    this.ampmForecast[1] = this.forecastTime(6)
+    this.ampmForecast[2] = this.forecastTime(9)
+    this.ampmForecast[3] = this.forecastTime(12)
+    this.ampmForecast[4] = this.forecastTime(15)
+
+    window.setInterval(() => {
+      this.ampmTime = this.currentTime()
+      this.ampmForecast[0] = this.forecastTime(3)
+      this.ampmForecast[1] = this.forecastTime(6)
+      this.ampmForecast[2] = this.forecastTime(9)
+      this.ampmForecast[3] = this.forecastTime(12)
+      this.ampmForecast[4] = this.forecastTime(15)
+    },5 * 1000);
+  },
+
   methods: {
-    fetchWeather (e) {
-      if (e.key == 'Enter') {
-        fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
-          .then(res => {
-            return res.json();
-          })
-          .then(this.weatherResults)
-          .then(this.getCurrentIcon);
-      }
-    },
+    // fetchWeather (e) {
+    //   if (e.key == 'Enter') {
+    //     fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
+    //       .then(res => {
+    //         return res.json();
+    //       })
+    //       .then(this.weatherResults)
+    //       .then(this.getCurrentIcon);
+    //   }
+    // },
 
-    fetchWeatherClick() {
-      fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
-        .then(res => {
-          return res.json();
-        })
-        .then(this.weatherResults)
-        .then(this.getCurrentIcon);
-    },
+    // fetchWeatherClick() {
+    //   fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
+    //     .then(res => {
+    //       return res.json();
+    //     })
+    //     .then(this.weatherResults)
+    //     .then(this.getCurrentIcon);
+    // },
 
-    weatherResults (results) {
-      this.weather = results;
-    },
+    // weatherResults (results) {
+    //   this.weather = results;
+    // },
 
-    forecastResults (results) {
-      this.forecast = results;
-    },
+    // forecastResults (results) {
+    //   this.forecast = results;
+    // },
 
     dateBuilder () {
       let d = new Date();
