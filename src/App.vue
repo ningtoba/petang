@@ -92,7 +92,7 @@ export default {
   name: 'App',
   data () {
     return {
-      weather_api: process.env.weather,
+      weather_api: process.env.VUE_APP_WEATHER,
       weather_url_base: 'https://api.openweathermap.org/data/2.5/',
       query: 'London, GB',
       weather: {},
