@@ -92,8 +92,8 @@ export default {
   name: 'App',
   data () {
     return {
-      api_key: '356eedcb664298728c52f42044631bd4',
-      url_base: 'https://api.openweathermap.org/data/2.5/',
+      weather_api: process.env.weather,
+      weather_url_base: 'https://api.openweathermap.org/data/2.5/',
       query: 'London, GB',
       weather: {},
       forecast: {},
@@ -105,15 +105,20 @@ export default {
   },
 
   created() {
-    fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
+    fetch(`${this.weather_url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.weather_api}`)
         .then(res => res.json())
         .then(data => (this.weather = data))
         .then(this.getCurrentIcon);
 
-      fetch(`${this.url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.api_key}`)
-        .then(res => res.json())
-        .then(data => (this.forecast = data))
-        .then(this.getForecastIcon);
+    fetch(`${this.weather_url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.weather_api}`)
+      .then(res => res.json())
+      .then(data => (this.forecast = data))
+      .then(this.getForecastIcon);
+
+    fetch(`${this.weather_url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.weather_api}`)
+      .then(res => res.json())
+      .then(data => (this.forecast = data))
+      .then(this.getForecastIcon);
   },
 
   mounted() {
@@ -136,12 +141,12 @@ export default {
 
   methods: {
     fetchWeatherForecast() {
-      fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
+      fetch(`${this.weather_url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.weather_api}`)
         .then(res => res.json())
         .then(data => (this.weather = data))
         .then(this.getCurrentIcon);
 
-      fetch(`${this.url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.api_key}`)
+      fetch(`${this.weather_url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.weather_api}`)
         .then(res => res.json())
         .then(data => (this.forecast = data))
         .then(this.getCurrentIcon);
