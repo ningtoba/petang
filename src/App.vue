@@ -10,11 +10,11 @@
             </div>
             <div class="date text-white text-2xl custom-shadow ml-2">{{ dateBuilder() }}</div>
           </div>
-          <div v-if="typeof weather.main != 'undefined'" class="flex flex-col mt-7 items-end">
+          <div v-if="weather.cod == 200" class="flex flex-col mt-7 items-end">
             <div class="relative text-gray-600">
               <input class="border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
-                type="text" name="search" placeholder="Search" v-model="query" @keypress="fetchWeather">
-                <button @click="fetchWeatherClick()" class="absolute right-0 top-0 mt-3 mr-3 focus:outline-none">
+                type="text" name="search" placeholder="Search" v-model="query" @keyup.enter="fetchWeatherForecast()">
+                <button @click="fetchWeatherForecast()" class="absolute right-0 top-0 mt-3 mr-3 focus:outline-none">
                   <svg class="text-gray-600 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"
                     viewBox="0 0 56.966 56.966" style="enable-background:new 0 0 56.966 56.966;" xml:space="preserve"
@@ -29,11 +29,11 @@
           </div>
         </div>
       </div>
-      <div v-if="typeof weather.main != 'undefined'" class="grid grid-cols-7 h-1/3 bg-gray-800">
+      <div v-if="forecast.cod == 200" class="grid grid-cols-7 h-1/3 bg-gray-800">
         <div class="grid grid-cols-3 col-span-2 px-14 place-items-center">
-          <img :src="currentIconUrl" alt="Weather Icon" class="col-span-2 w-72 h-72">
+          <img :src="currentIconUrl" alt="Weather Icon" class="col-span-2 w-52 h-52">
           <div class="flex flex-col justify-around">
-            <span class="text-white text-xl font-semibold text-center py-2 rounded-full bg-gray-900">CURRENTLY</span>
+            <span class="text-white text-xl font-semibold text-center py-2 px-5 rounded-full bg-gray-900">CURRENTLY</span>
             <span class="text-white text-8xl text-center font-semibold">{{ Math.round(weather.main.temp) }}°c</span>
           </div>
         </div>
@@ -135,33 +135,17 @@ export default {
   },
 
   methods: {
-    // fetchWeather (e) {
-    //   if (e.key == 'Enter') {
-    //     fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
-    //       .then(res => {
-    //         return res.json();
-    //       })
-    //       .then(this.weatherResults)
-    //       .then(this.getCurrentIcon);
-    //   }
-    // },
+    fetchWeatherForecast() {
+      fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
+        .then(res => res.json())
+        .then(data => (this.weather = data))
+        .then(this.getCurrentIcon);
 
-    // fetchWeatherClick() {
-    //   fetch(`${this.url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.api_key}`)
-    //     .then(res => {
-    //       return res.json();
-    //     })
-    //     .then(this.weatherResults)
-    //     .then(this.getCurrentIcon);
-    // },
-
-    // weatherResults (results) {
-    //   this.weather = results;
-    // },
-
-    // forecastResults (results) {
-    //   this.forecast = results;
-    // },
+      fetch(`${this.url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.api_key}`)
+        .then(res => res.json())
+        .then(data => (this.forecast = data))
+        .then(this.getCurrentIcon);
+    },
 
     dateBuilder () {
       let d = new Date();
