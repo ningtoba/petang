@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="h-screen">
-    <main class="h-full">
-      <div class="h-2/3 p-20 object-center bg-cover backgroundImage">
+    <main v-if="weather.cod == 200" class="h-full">
+      <div class="h-3/5 p-20 bg-center bg-cover backgroundImage" :style="`background-image: url('${bgUrl}')`" >
         <div class="grid grid-cols-2 h-1/3">
           <div class="flex flex-col place-content-between">
             <div>
@@ -10,11 +10,11 @@
             </div>
             <div class="date text-white text-2xl custom-shadow ml-2">{{ dateBuilder() }}</div>
           </div>
-          <div v-if="weather.cod == 200" class="flex flex-col mt-7 items-end">
+          <div class="flex flex-col mt-7 items-end">
             <div class="relative text-gray-600">
               <input class="border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
-                type="text" name="search" placeholder="Search" v-model="query" @keyup.enter="fetchWeatherForecast()">
-                <button @click="fetchWeatherForecast()" class="absolute right-0 top-0 mt-3 mr-3 focus:outline-none">
+                type="text" name="search" placeholder="Search" v-model="query" @keyup.enter="fetchWeatherEvent()">
+                <button @click="fetchWeatherEvent()" class="absolute right-0 top-0 mt-3 mr-3 focus:outline-none">
                   <svg class="text-gray-600 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"
                     viewBox="0 0 56.966 56.966" style="enable-background:new 0 0 56.966 56.966;" xml:space="preserve"
@@ -29,7 +29,7 @@
           </div>
         </div>
       </div>
-      <div v-if="forecast.cod == 200" class="grid grid-cols-7 h-1/3 bg-gray-800">
+      <div class="grid grid-cols-7 h-2/5 bg-gray-800">
         <div class="grid grid-cols-3 col-span-2 px-14 place-items-center">
           <img :src="currentIconUrl" alt="Weather Icon" class="col-span-2 w-52 h-52">
           <div class="flex flex-col justify-around">
@@ -93,63 +93,79 @@ export default {
   data () {
     return {
       weather_api: process.env.VUE_APP_WEATHER,
+      pexels_api: process.env.VUE_APP_PEXELS,
       weather_url_base: 'https://api.openweathermap.org/data/2.5/',
+      pexels_url_base: 'https://api.pexels.com/v1/search',
       query: 'London, GB',
       weather: {},
       forecast: {},
       ampmTime: this.currentTime(),
       ampmForecast: [],
       currentIconUrl: String,
-      forecastIconUrl: []
+      forecastIconUrl: [],
+      pexels: {},
+      interval: null
     }
   },
 
-  created() {
-    fetch(`${this.weather_url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.weather_api}`)
-        .then(res => res.json())
-        .then(data => (this.weather = data))
-        .then(this.getCurrentIcon);
-
-    fetch(`${this.weather_url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.weather_api}`)
-      .then(res => res.json())
-      .then(data => (this.forecast = data))
-      .then(this.getForecastIcon);
-
-    fetch(`${this.weather_url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.weather_api}`)
-      .then(res => res.json())
-      .then(data => (this.forecast = data))
-      .then(this.getForecastIcon);
+  beforeUnmount() {
+    clearInterval(this.interval)
   },
 
-  mounted() {
-    this.ampmTime = this.currentTime()
-    this.ampmForecast[0] = this.forecastTime(3)
-    this.ampmForecast[1] = this.forecastTime(6)
-    this.ampmForecast[2] = this.forecastTime(9)
-    this.ampmForecast[3] = this.forecastTime(12)
-    this.ampmForecast[4] = this.forecastTime(15)
+  created() {
+    this.fetchWeatherForecastBg();
+    this.getCurrentForecastTime();
+    this.interval = setInterval(() => {
+      this.getCurrentForecastTime();
+    }, 1000)
+  },
 
-    window.setInterval(() => {
+  methods: {
+    getCurrentForecastTime() {
       this.ampmTime = this.currentTime()
       this.ampmForecast[0] = this.forecastTime(3)
       this.ampmForecast[1] = this.forecastTime(6)
       this.ampmForecast[2] = this.forecastTime(9)
       this.ampmForecast[3] = this.forecastTime(12)
       this.ampmForecast[4] = this.forecastTime(15)
-    },5 * 1000);
-  },
+    },
 
-  methods: {
-    fetchWeatherForecast() {
+    fetchWeatherEvent() {
       fetch(`${this.weather_url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.weather_api}`)
         .then(res => res.json())
-        .then(data => (this.weather = data))
-        .then(this.getCurrentIcon);
+        .then(data => this.weather = data)
+        .then(this.getCurrentIcon)
+        .then(this.pexelsBg)
 
       fetch(`${this.weather_url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.weather_api}`)
         .then(res => res.json())
-        .then(data => (this.forecast = data))
+        .then(data => this.forecast = data)
         .then(this.getCurrentIcon);
+    },
+
+    fetchWeatherForecastBg() {
+      fetch(`${this.weather_url_base}weather?q=${this.query.trim()}&units=metric&APPID=${this.weather_api}`)
+        .then(res => res.json())
+        .then(data => this.weather = data)
+        .then(this.getCurrentIcon)
+        .then(this.pexelsBg)
+
+      fetch(`${this.weather_url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.weather_api}`)
+        .then(res => res.json())
+        .then(data => this.forecast = data)
+        .then(this.getForecastIcon);
+    },
+
+    pexelsBg() {
+      fetch(`${this.pexels_url_base}?query=${this.weather.weather[0].description}&orientation=landscape&size=large&per_page=80`, {
+        headers: {
+          Authorization: process.env.VUE_APP_PEXELS
+        }
+      }).then(res => res.json())
+        .then(data => {
+          this.pexels = data
+          this.bgUrl = this.pexels.photos[Math.floor(Math.random() * 79)].src.large2x
+          })
     },
 
     dateBuilder () {
@@ -199,8 +215,10 @@ export default {
     },
 
     forecastTime(hrs) {
-      let d = new Date();
-      let hours = d.getHours() + hrs;
+      let d = new Date;
+      let hours = d.setHours(d.getHours() + hrs);
+      d = new Date(hours)
+      hours = d.getHours()
       let minutes = d.getMinutes();
       let ampm = hours >= 12 ? 'PM' : 'AM';
       hours = hours % 12;
@@ -220,7 +238,7 @@ export default {
       this.forecastIconUrl[2] = 'https://openweathermap.org/img/wn/' + this.forecast.list[2].weather[0].icon + '@4x.png';
       this.forecastIconUrl[3] = 'https://openweathermap.org/img/wn/' + this.forecast.list[3].weather[0].icon + '@4x.png';
       this.forecastIconUrl[4] = 'https://openweathermap.org/img/wn/' + this.forecast.list[4].weather[0].icon + '@4x.png';
-    }
+    },
   }
 }
 </script>
@@ -241,9 +259,8 @@ export default {
   } */
 
   .backgroundImage {
-    background-image: url('./assets/cold.jpg');
     background-size: cover;
-    transition: 0.4s;
+    transition: 0.6s;
   }
 
   main {
