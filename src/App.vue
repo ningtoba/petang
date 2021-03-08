@@ -1,7 +1,12 @@
 <template>
   <div id="app" class="h-screen">
     <main v-if="weather.cod == 200" class="h-full">
-      <div class="h-3/5 p-20 bg-center bg-cover backgroundImage" :style="`background-image: url('${bgUrl}')`" >
+      <div class="h-3/5 p-20 bg-center bg-cover backgroundImage relative" :style="`background-image: url('${bgUrl}')`" >
+      <div class="absolute bottom-0 left-0 bg-gray-600 px-5 py-2 mb-2 ml-2 rounded-xl w-28">
+          <a href="https://www.pexels.com">
+            <img src="https://images.pexels.com/lib/api/pexels-white.png" alt="Pexels Logo">
+          </a>
+      </div>
         <div class="grid grid-cols-2 h-1/3">
           <div class="flex flex-col place-content-between">
             <div>
@@ -153,7 +158,7 @@ export default {
       fetch(`${this.weather_url_base}forecast?q=${this.query.trim()}&units=metric&cnt=5&APPID=${this.weather_api}`)
         .then(res => res.json())
         .then(data => this.forecast = data)
-        .then(this.getForecastIcon);
+        .then(this.getForecastIcon); 
     },
 
     pexelsBg() {
@@ -260,7 +265,7 @@ export default {
 
   .backgroundImage {
     background-size: cover;
-    transition: 0.6s;
+    transition: 2s;
   }
 
   main {
