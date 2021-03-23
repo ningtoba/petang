@@ -170,7 +170,7 @@ export default {
         .then(data => {
           this.pexels = data
           this.bgUrl = this.pexels.photos[Math.floor(Math.random() * 79)].src.large2x
-          }) 
+          })
     },
 
     dateBuilder () {
